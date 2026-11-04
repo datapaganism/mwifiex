@@ -274,7 +274,7 @@ woal_cfg80211_remain_on_channel(struct wiphy *wiphy,
 #if CFG80211_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
 				enum nl80211_channel_type channel_type,
 #endif
-				unsigned int duration, u64 *cookie
+				unsigned int duration, u64 cookie
 #if (defined(ANDROID_SDK_VERSION) && (ANDROID_SDK_VERSION >= 36) &&            \
      (CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 18, 21))) ||                  \
 	(CFG80211_VERSION_CODE >= KERNEL_VERSION(7, 1, 0))
@@ -7938,7 +7938,7 @@ woal_cfg80211_remain_on_channel(struct wiphy *wiphy, struct wireless_dev *wdev,
 #if CFG80211_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
 				enum nl80211_channel_type channel_type,
 #endif
-				unsigned int duration, u64 *cookie
+				unsigned int duration, u64 cookie
 #if (defined(ANDROID_SDK_VERSION) && (ANDROID_SDK_VERSION >= 36) &&            \
      (CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 18, 21))) ||                  \
 	(CFG80211_VERSION_CODE >= KERNEL_VERSION(7, 1, 0))
@@ -7963,7 +7963,7 @@ static int
 woal_cfg80211_remain_on_channel(struct wiphy *wiphy, struct net_device *dev,
 				struct ieee80211_channel *chan,
 				enum nl80211_channel_type channel_type,
-				unsigned int duration, u64 *cookie
+				unsigned int duration, u64 cookie
 #if defined(ANDROID_SDK_VERSION) && (ANDROID_SDK_VERSION >= 36) &&             \
 	(CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 18, 21))
 				,
@@ -8036,6 +8036,7 @@ woal_cfg80211_remain_on_channel(struct wiphy *wiphy, struct net_device *dev,
 
 	/* remain on channel operation success */
 	/* we need update the value cookie */
+#if KERNEL_VERSION(7, 2, 0) > LINUX_VERSION_CODE
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
 	*cookie = (u64)random32() | 1;
 #else
@@ -8045,9 +8046,10 @@ woal_cfg80211_remain_on_channel(struct wiphy *wiphy, struct net_device *dev,
 	*cookie = (u64)get_random_u32() | 1;
 #endif
 #endif
+#endif
 	priv->phandle->remain_on_channel = MTRUE;
 	priv->phandle->remain_bss_index = priv->bss_index;
-	priv->phandle->cookie = *cookie;
+	priv->phandle->cookie = cookie;
 #if CFG80211_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
 	priv->phandle->channel_type = channel_type;
 #endif
@@ -8068,7 +8070,7 @@ woal_cfg80211_remain_on_channel(struct wiphy *wiphy, struct net_device *dev,
 #else
 		priv->wdev,
 #endif
-		*cookie, chan,
+		cookie, chan,
 #if CFG80211_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
 		channel_type,
 #endif
@@ -11561,7 +11563,7 @@ done:
  */
 static int woal_cfg80211_probe_client(struct wiphy *wiphy,
 				      struct net_device *dev, const u8 *peer,
-				      u64 *cookie)
+				      u64 cookie)
 {
 	return -1;
 }

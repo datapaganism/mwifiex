@@ -3503,7 +3503,7 @@ int woal_cfg80211_mgmt_tx(struct wiphy *wiphy,
 			  bool dont_wait_for_ack,
 #endif
 #endif
-			  u64 *cookie)
+			  u64 cookie)
 {
 #if KERNEL_VERSION(3, 6, 0) <= CFG80211_VERSION_CODE
 	struct net_device *dev = wdev->netdev;
@@ -3731,6 +3731,7 @@ int woal_cfg80211_mgmt_tx(struct wiphy *wiphy,
 	}
 #endif
 
+#if KERNEL_VERSION(7, 2, 0) > LINUX_VERSION_CODE
 #if KERNEL_VERSION(3, 8, 0) > LINUX_VERSION_CODE
 	*cookie = random32() | 1;
 #else
@@ -3738,6 +3739,7 @@ int woal_cfg80211_mgmt_tx(struct wiphy *wiphy,
 	*cookie = prandom_u32() | 1;
 #else
 	*cookie = get_random_u32() | 1;
+#endif
 #endif
 #endif
 
@@ -3753,13 +3755,13 @@ int woal_cfg80211_mgmt_tx(struct wiphy *wiphy,
 					sizeof(moal_802_11_action_header))) {
 			PRINTM(MINFO,
 			       "NAN: set tx duration expired for cookie=%llx\n",
-			       *cookie);
+			       cookie);
 			send_tx_expired = true;
 		}
 	}
 #endif
 
-	ret = woal_mgmt_tx(priv, buf, len, chan, *cookie, wait,
+	ret = woal_mgmt_tx(priv, buf, len, chan, cookie, wait,
 			   send_tx_expired);
 
 done:

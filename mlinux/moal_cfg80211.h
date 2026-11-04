@@ -351,7 +351,7 @@ int woal_cfg80211_mgmt_tx(struct wiphy *wiphy,
 			  bool dont_wait_for_ack,
 #endif
 #endif
-			  u64 *cookie);
+			  u64 cookie);
 #endif
 
 mlan_status woal_register_cfg80211(moal_private *priv);
